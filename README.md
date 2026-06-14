@@ -1,5 +1,4 @@
-# Live Web Link -> https://github.com/empi-empi/Memory-Management---nOS
-
+# Live Web Link -> https://empi-empi.github.io/Memory-Management---nOS/
 # Memory Management Simulator
 
 An interactive, single-file HTML simulator demonstrating core memory management
