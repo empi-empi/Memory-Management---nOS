@@ -133,9 +133,3 @@ faults**, and **TLB hit rate** across all tabs.
 - All state is held in memory (JavaScript variables) and resets on page
   reload, or via the **Reset** button.
 
-> **Known issue:** the source HTML retains unused JavaScript functions for a
-> segmentation tab (`allocSegments`, `renderSegTable`, `translateSegAddr`,
-> etc.) and references a `seg-log` element. The Segmentation tab itself is not
-> present in the current UI (only Paging, Virtual Memory, and Fragmentation
-> exist). These functions are dead code and can be safely removed, or the
-> Segmentation tab can be restored if required by your documentation scope.
