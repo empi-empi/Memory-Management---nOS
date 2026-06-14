@@ -1,0 +1,889 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    color-scheme: dark;
+    --bg: #05070f;
+    --bg-panel: rgba(15, 23, 42, 0.96);
+    --bg-panel-soft: rgba(15, 23, 42, 0.85);
+    --bg-alt: rgba(148, 163, 184, 0.06);
+    --border: rgba(148, 163, 184, 0.16);
+    --border-strong: rgba(148, 163, 184, 0.22);
+    --text: #e2e8f0;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --text-success: #7dd3fc;
+    --text-info: #38bdf8;
+    --text-warning: #facc15;
+    --text-danger: #f87171;
+    --bg-success: rgba(34, 197, 94, 0.14);
+    --bg-info: rgba(56, 189, 248, 0.12);
+    --bg-warning: rgba(250, 204, 21, 0.12);
+    --bg-danger: rgba(248, 113, 113, 0.12);
+    --border-radius-lg: 22px;
+    --border-radius-md: 14px;
+    --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: "Fira Code", "Courier New", monospace;
+  }
+  html, body { min-height: 100%; }
+  body { font-family: var(--font-sans); background: radial-gradient(circle at top, rgba(56,189,248,0.08), transparent 22%), #02040a; color: var(--text); padding: 24px; }
+  .sim { max-width: 1380px; margin: 0 auto; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+  .header-card { padding: 28px; margin-bottom: 22px; display: flex; flex-direction: column; gap: 20px; background: linear-gradient(180deg, rgba(15,23,42,0.96), rgba(8,15,27,0.98)); border: 1px solid var(--border); border-radius: 28px; box-shadow: 0 24px 80px rgba(0,0,0,0.35); }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .header-title { display: flex; flex-direction: column; gap: 10px; }
+  .eyebrow { font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--text-secondary); }
+  .title { font-size: 2rem; line-height: 1.05; font-weight: 800; color: var(--text-primary); }
+  .subtitle { font-size: 14px; color: var(--text-secondary); max-width: 44rem; line-height: 1.7; }
+  .header-badges { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .header-badges .badge { padding: 9px 14px; border-radius: 999px; border: 1px solid var(--border); background: rgba(148,163,184,0.08); font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
+  .header-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: flex-start; }
+  .header-status { display: inline-flex; align-items: center; gap: 12px; margin-left: auto; font-size: 13px; color: var(--text-primary); background: rgba(15,23,42,0.82); border: 1px solid var(--border); border-radius: 999px; padding: 12px 18px; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #34d399; box-shadow: 0 0 0 4px rgba(52,211,153,0.14); }
+  .tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .tab { padding: 12px 18px; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: 999px; background: rgba(148,163,184,0.06); border: 1px solid transparent; color: var(--text-secondary); transition: all 0.2s ease; }
+  .tab.active { background: rgba(56,189,248,0.14); border-color: rgba(56,189,248,0.35); color: var(--text-primary); }
+  .tab:hover { background: rgba(148,163,184,0.12); color: var(--text-primary); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .section-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; letter-spacing: 0.01em; }
+  .muted { font-size: 13px; color: var(--text-secondary); }
+  .card { background: var(--bg-panel); border: 1px solid var(--border); border-radius: var(--border-radius-lg); padding: 22px; box-shadow: 0 16px 40px rgba(0,0,0,0.18); margin-bottom: 18px; }
+  .grid2, .grid3 { display: grid; gap: 16px; }
+  .grid2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 980px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+  .stat { background: rgba(15,23,42,0.78); border: 1px solid var(--border-strong); border-radius: 20px; padding: 22px; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.08em; }
+  .stat-value { font-size: 2rem; font-weight: 800; color: var(--text-primary); line-height: 1; }
+  .stat-sub { font-size: 12px; color: var(--text-secondary); margin-top: 8px; }
+  button { font-family: var(--font-sans); font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid var(--border); border-radius: 999px; padding: 12px 18px; background: rgba(148,163,184,0.08); color: var(--text-primary); transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease; }
+  button:hover { background: rgba(148,163,184,0.14); }
+  button:active { transform: scale(0.98); }
+  button.primary { background: #0c4a6e; color: #f8fafc; border-color: rgba(56,189,248,0.45); }
+  button.primary:hover { background: #155e75; }
+  button.danger { background: rgba(248,113,113,0.14); color: #fecaca; border-color: rgba(248,113,113,0.35); }
+  button.danger:hover { background: rgba(248,113,113,0.24); }
+  select, input[type=number], input[type=text] { font-family: var(--font-sans); font-size: 13px; border: 1px solid var(--border); border-radius: 14px; padding: 11px 14px; background: rgba(15,23,42,0.9); color: var(--text-primary); outline: none; min-height: 42px; }
+  select:focus, input:focus { border-color: rgba(56,189,248,0.5); }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .space-between { justify-content: space-between; }
+  .badge { display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; padding: 7px 12px; border-radius: 999px; background: rgba(148,163,184,0.12); color: var(--text-secondary); }
+  .badge-blue { background: var(--bg-info); color: var(--text-info); }
+  .badge-green { background: var(--bg-success); color: var(--text-success); }
+  .badge-red { background: var(--bg-danger); color: var(--text-danger); }
+  .badge-amber { background: var(--bg-warning); color: var(--text-warning); }
+  .badge-gray { background: rgba(148,163,184,0.12); color: var(--text-secondary); }
+  .frame-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(36px, 1fr)); gap: 6px; margin-bottom: 14px; }
+  .frame { height: 36px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; cursor: pointer; transition: transform 0.2s ease, opacity 0.2s ease; border: 1px solid transparent; position: relative; }
+  .frame.free { background: rgba(148,163,184,0.08); border-color: var(--border); color: var(--text-secondary); }
+  .frame.alloc { color: #fff; font-size: 10px; }
+  .frame:hover { opacity: 0.95; transform: translateY(-1px); }
+  .frame-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); }
+  .legend-dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+  .proc-row { display: flex; align-items: center; gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--border-strong); }
+  .proc-row:last-child { border-bottom: none; }
+  .proc-bar { flex: 1; height: 10px; background: rgba(148,163,184,0.08); border-radius: 999px; overflow: hidden; }
+  .proc-bar-fill { height: 100%; border-radius: 999px; transition: width 0.3s ease; }
+  .ptable { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ptable th, .ptable td { padding: 10px 12px; border-bottom: 1px solid var(--border-strong); }
+  .ptable th { font-size: 12px; color: var(--text-secondary); text-align: left; }
+  .ptable tr:hover td { background: rgba(148,163,184,0.08); }
+  .seg-visual { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .seg-block { border-radius: 16px; display: flex; align-items: center; padding: 12px 14px; font-size: 12px; font-weight: 700; transition: transform 0.2s ease; min-height: 44px; }
+  .seg-block:hover { transform: translateY(-1px); }
+  .log { background: rgba(15,23,42,0.9); border-radius: 20px; padding: 18px; font-family: var(--font-mono); font-size: 12px; max-height: 240px; overflow-y: auto; color: var(--text-secondary); border: 1px solid var(--border); }
+  .log-entry { padding: 2px 0; }
+  .log-entry.ok { color: var(--text-success); }
+  .log-entry.err { color: var(--text-danger); }
+  .log-entry.info { color: var(--text-info); }
+  .log-entry.warn { color: var(--text-warning); }
+  .addr-box { background: rgba(15,23,42,0.9); border-radius: 18px; padding: 18px; font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); border: 1px solid var(--border); min-height: 96px; }
+  .addr-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .addr-label { font-size: 12px; color: var(--text-secondary); min-width: 120px; }
+  .addr-val { font-size: 13px; font-weight: 600; color: var(--text-primary); background: rgba(148,163,184,0.08); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; min-width: 120px; }
+  .addr-highlight { color: var(--text-success); }
+  .addr-fault { color: var(--text-danger); font-weight: 700; }
+  .tlb-entry { display: flex; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border-strong); }
+  .tlb-entry:last-child { border-bottom: none; }
+  .tlb-hit { color: var(--text-success); font-weight: 700; }
+  .tlb-miss { color: var(--text-danger); }
+  input[type=range] { width: 100%; accent-color: var(--text-primary); }
+</style>
+
+<h2 class="sr-only">Memory Management Simulator — Paging, Demand Paging, TLB, and Copy-on-Write demonstration</h2>
+
+<div class="sim">
+  <div class="header-card">
+    <div class="header-top">
+      <div class="header-title">
+        <span class="eyebrow">Memory Management Dashboard</span>
+        <div class="title">Memory Management Simulator</div>
+        <div class="subtitle">Explore demand paging, 3-level page tables, TLB, and copy-on-write in an interactive OS memory subsystem demo.</div>
+      </div>
+      <div class="header-badges">
+        <span class="badge">Paging</span>
+        <span class="badge">Demand Paging</span>
+        <span class="badge">TLB</span>
+        <span class="badge">Copy-on-Write</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="primary" onclick="allocProcess()">Allocate process</button>
+      <button type="button" onclick="resetAll()">Reset</button>
+      <div class="header-status"><span class="status-dot"></span><span>Running · demo mode</span></div>
+    </div>
+  </div>
+
+  <div class="grid3" style="margin-bottom:1.5rem">
+    <div class="stat"><div class="stat-label">Physical Memory</div><div class="stat-value" id="s-free">--</div><div class="stat-sub" id="s-free-sub"></div></div>
+    <div class="stat"><div class="stat-label">Demand Paging Faults</div><div class="stat-value" id="s-faults">0</div><div class="stat-sub">since boot</div></div>
+    <div class="stat"><div class="stat-label">TLB Hit Rate</div><div class="stat-value" id="s-tlb">100%</div><div class="stat-sub" id="s-tlb-sub">0 / 0</div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('paging')">Paging</div>
+    <div class="tab" onclick="switchTab('virtual')">Virtual Memory</div>
+    <div class="tab" onclick="switchTab('fragmentation')">Fragmentation</div>
+  </div>
+
+  <!-- ========== PAGING TAB ========== -->
+  <div class="panel active" id="panel-paging">
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <div class="section-title">Allocate Process</div>
+          <div class="row"><input id="p-name" type="text" placeholder="Process name" style="width:120px" value="P1"/><input id="p-size" type="number" min="1" max="16" value="4" style="width:70px"/><span class="muted">pages</span><button class="primary" onclick="allocProcess()">Allocate</button></div>
+          <div class="muted" style="margin-top:8px">Pages are assigned to any free frames; fixed-size paging uses no fit algorithm.</div>
+          <div class="row" style="margin-top:14px"><button class="primary" onclick="forkProcess()">Fork Selected Process</button><input id="cow-vpn" type="number" min="0" value="0" style="width:70px"/><span class="muted">VPN for write</span><button class="primary" onclick="writeAccess()">Simulate Write Access</button></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Running Processes</div>
+          <div id="proc-list"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="section-title">Physical Memory — 64 Frames × 4KB</div>
+          <div class="frame-legend" id="frame-legend"></div>
+          <div class="frame-grid" id="frame-grid"></div>
+          <div class="muted">Click a frame for details</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Page Table — Selected Process</div>
+      <div class="row" style="margin-bottom:8px"><select id="pt-proc-select" onchange="renderPageTable()"><option value="">Select process…</option></select></div>
+      <div id="page-table-view"></div>
+    </div>
+    <div class="card"><div class="section-title">System Log</div><div class="log" id="paging-log"></div></div>
+  </div>
+
+
+  <!-- ========== VIRTUAL MEMORY TAB ========== -->
+  <div class="panel" id="panel-virtual">
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <div class="section-title">Virtual Address Translator</div>
+          <div class="muted" style="margin-bottom:12px">32-bit virtual address space · 4KB pages · 3-level page table</div>
+          <div class="addr-row"><span class="addr-label">Virtual Address</span><input id="va-input" type="text" value="0x00401000" style="width:130px"/><select id="va-proc"><option value="">Select process</option></select><button onclick="translateVA()">Translate</button></div>
+          <div id="va-result" class="addr-box" style="margin-top:12px;min-height:80px"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">TLB — Translation Lookaside Buffer (8 entries)</div>
+          <div id="tlb-view"></div>
+        </div>
+        <div class="card"><div class="section-title">Page Replacement Policy</div>
+          <div class="row"><span class="muted">LRU only</span></div>
+          <div class="row"><button onclick="simulatePageRef()">Simulate Page Reference</button><button onclick="flushTLB()">Flush TLB</button><button onclick="changePageMapping()">Change Page Mapping</button></div>
+          <div id="pr-info" class="muted" style="margin-top:4px"></div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="section-title">Virtual → Physical Address Breakdown</div>
+          <div id="va-breakdown"></div>
+        </div>
+        <div class="card">
+          <div class="section-title">Demand Paging — Page Fault Triggered</div>
+          <div id="pf-frames" style="margin-bottom:8px"></div>
+          <div class="row"><input id="pf-ref" type="number" value="3" min="0" max="15" style="width:70px"/><span class="muted">page #</span><button onclick="simulateFault()">Reference Page</button><button onclick="clearPFSim()">Clear</button></div>
+          <div id="pf-log" class="log" style="max-height:100px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FRAGMENTATION TAB ========== -->
+  <div class="panel" id="panel-fragmentation">
+    <div class="card">
+      <div class="section-title">Fragmentation Demo — External vs Internal</div>
+      <div class="grid2">
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:8px">External Fragmentation (Contiguous Allocation)</div>
+          <div class="muted" style="margin-bottom:8px">Free blocks scattered; large allocation may fail even with enough total free memory</div>
+          <div id="ext-frag-vis" style="display:flex;gap:2px;flex-wrap:wrap;margin-bottom:8px"></div>
+          <div class="row"><button onclick="extFragStep()">Simulate Step</button><button onclick="resetExtFrag()">Reset</button><button onclick="compactMemory()">Compact</button></div>
+          <div id="ext-frag-info" class="muted" style="margin-top:6px"></div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:8px">Internal Fragmentation (Fixed-Size Paging)</div>
+          <div class="muted" style="margin-bottom:8px">Process doesn't fill last page; wasted space inside allocated block</div>
+          <div class="row"><input id="int-proc-size" type="number" value="13" min="1" max="64" style="width:70px"/><span class="muted">KB process</span><button onclick="calcInternalFrag()">Calculate</button></div>
+          <div id="int-frag-vis" style="margin-bottom:8px"></div>
+          <div id="int-frag-info" class="muted"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-title">Compaction Visualizer</div>
+      <div class="grid2">
+        <div><div class="muted" style="margin-bottom:6px">Before compaction</div><div id="compact-before" style="display:flex;gap:2px;flex-wrap:wrap"></div></div>
+        <div><div class="muted" style="margin-bottom:6px">After compaction</div><div id="compact-after" style="display:flex;gap:2px;flex-wrap:wrap"></div></div>
+      </div>
+      <div id="compact-stats" class="muted" style="margin-top:8px"></div>
+    </div>
+    <div class="card"><div class="section-title">System Log</div><div class="log" id="frag-log"></div></div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const PAGE_SIZE = 4; // KB
+const TOTAL_FRAMES = 64;
+
+let frames = Array(TOTAL_FRAMES).fill(null);
+let processes = {}; // {name:{color,pageEntries:[...],pageMap:{vpn:entry}}}
+let pageFaults = 0, tlbHits = 0, tlbTotal = 0;
+
+const COLORS = ['#4C72B0','#DD8452','#55A868','#C44E52','#8172B2','#937860','#DA8BC3','#8C8C8C','#CCB974','#64B5CD'];
+let colorIdx = 0;
+
+let tlb = []; // {vpn,pfn,proc,used}
+let pfSim = {frames:[],refs:[],policy:'lru',ptr:0,clk:[]};
+
+function splitVPN(vpn){
+  return {
+    l1: (vpn >> 12) & 0xFF,
+    l2: (vpn >> 4) & 0xFF,
+    l3: vpn & 0xF
+  };
+}
+
+function createPageEntry(vpn, pfn, cow = false){
+  const {l1, l2, l3} = splitVPN(vpn);
+  return {vpn, l1, l2, l3, pfn, valid: true, dirty: false, referenced: false, cow};
+}
+
+function buildPageTable(chosen){
+  const entries = [];
+  const map = {};
+  chosen.forEach((pfn, vpn) => {
+    const entry = createPageEntry(vpn, pfn, false);
+    entries.push(entry);
+    map[vpn] = entry;
+  });
+  return {entries, map};
+}
+
+function getPageEntry(proc, vpn){
+  return proc && proc.pageMap ? proc.pageMap[vpn] || null : null;
+}
+
+let extFragBlocks = [];
+let extFragInitialized = false;
+
+// ============================================================
+// HELPERS
+// ============================================================
+function plog(el,msg,cls=''){const d=document.getElementById(el);const e=document.createElement('div');e.className='log-entry '+cls;e.textContent='['+new Date().toLocaleTimeString()+']: '+msg;d.prepend(e);if(d.children.length>80)d.removeChild(d.lastChild)}
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function fmtKB(n){return n<1024?n+'KB':+(n/1024).toFixed(1)+'MB'}
+
+function updateStats(){
+  const usedFrames=frames.filter(f=>f!==null).length;
+  const freeFrames=TOTAL_FRAMES-usedFrames;
+  document.getElementById('s-free').textContent=fmtKB(freeFrames*PAGE_SIZE);
+  document.getElementById('s-free-sub').textContent=freeFrames+' frames free of '+TOTAL_FRAMES;
+  document.getElementById('s-faults').textContent=pageFaults;
+  const rate=tlbTotal>0?Math.round(tlbHits/tlbTotal*100):100;
+  document.getElementById('s-tlb').textContent=rate+'%';
+  document.getElementById('s-tlb-sub').textContent=tlbHits+' hits / '+tlbTotal+' accesses';
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(e=>e.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('panel-'+t).classList.add('active');
+  if(t==='fragmentation'&&!extFragInitialized)initExtFrag();
+  if(t==='virtual')renderTLB();
+}
+
+// ============================================================
+// PAGING
+// ============================================================
+function renderFrameGrid(){
+  const g=document.getElementById('frame-grid');
+  g.innerHTML='';
+  const legend=document.getElementById('frame-legend');
+  legend.innerHTML='<div class="legend-item"><div class="legend-dot" style="background:rgba(148,163,184,0.12);border:0.5px solid var(--color-border-tertiary)"></div>Free</div>';
+  const shown={};
+  frames.forEach((f,i)=>{
+    const el=document.createElement('div');
+    el.className='frame '+(f?'alloc':'free');
+    if(f){
+      const owner=f.procs[0];
+      const p=processes[owner];
+      el.title='Frame '+i+' → '+f.procs.join(', ')+(f.cow?' (COW shared)':'');
+      el.style.background=p?p.color:'#888';
+      el.style.borderColor='transparent';
+      el.textContent=f.procs.length>1?'COW':owner.substring(0,2);
+      const shownKey=f.procs.join(',');
+      if(!shown[shownKey]){
+        shown[shownKey]=true;
+        legend.innerHTML+='<div class="legend-item"><div class="legend-dot" style="background:'+(p?p.color:'#888')+'"></div>'+owner+(f.procs.length>1?' + shared':'')+'</div>';
+      }
+    } else {
+      el.title='Frame '+i+' (free)';
+    }
+    el.onclick=()=>frameDetail(i);
+    g.appendChild(el);
+  });
+}
+
+function frameDetail(i){
+  const f=frames[i];
+  if(!f)plog('paging-log','Frame '+i+': free', 'info');
+  else{
+    plog('paging-log','Frame '+i+' → '+f.procs.join(', ')+' '+(f.cow?'(COW shared)':'')+'', 'ok');
+  }
+}
+
+function allocProcess(){
+  const name=document.getElementById('p-name').value.trim()||'P'+(Object.keys(processes).length+1);
+  const sz=parseInt(document.getElementById('p-size').value)||4;
+  if(processes[name]){plog('paging-log','Process '+name+' already exists','err');return}
+  const freeIdxs=frames.map((f,i)=>f===null?i:-1).filter(i=>i>=0);
+  if(freeIdxs.length<sz){plog('paging-log','Not enough free frames for '+name+' (need '+sz+', have '+freeIdxs.length+')','err');return}
+  const chosen=freeIdxs.slice(0,sz);
+  const color=COLORS[colorIdx++%COLORS.length];
+  const {entries,map} = buildPageTable(chosen);
+  processes[name]={color,pageEntries:entries,pageMap:map};
+  chosen.forEach(i=>{frames[i]={procs:[name],cow:false}});
+  plog('paging-log','Allocated '+sz+' pages to '+name+' → frames ['+chosen.join(',')+']','ok');
+  renderFrameGrid(); renderProcList(); updateProcSelect(); renderPageTable(); updateStats();
+  document.getElementById('p-name').value='P'+(Object.keys(processes).length+1);
+}
+
+function renderProcList(){
+  const el=document.getElementById('proc-list');
+  el.innerHTML='';
+  if(!Object.keys(processes).length){el.innerHTML='<div class="muted">No processes running</div>';return}
+  Object.entries(processes).forEach(([name,p])=>{
+    const used=p.pageEntries.length*PAGE_SIZE;
+    const div=document.createElement('div');div.className='proc-row';
+    div.innerHTML=`<div style="width:60px;font-size:13px;font-weight:500">${name}</div><div class="proc-bar"><div class="proc-bar-fill" style="width:${Math.min(100,p.pageEntries.length/TOTAL_FRAMES*100)}%;background:${p.color}"></div></div><span class="muted" style="min-width:48px;text-align:right">${fmtKB(used)}</span><button class="danger" style="padding:3px 8px;font-size:11px" onclick="freeProcess('${name}')">Free</button>`;
+    el.appendChild(div);
+  });
+}
+
+function freeProcess(name){
+  const p=processes[name];
+  if(!p)return;
+  p.pageEntries.forEach(entry=>{
+    const frame=frames[entry.pfn];
+    if(frame){
+      frame.procs = frame.procs.filter(owner=>owner!==name);
+      frame.cow = frame.procs.length>1;
+      if(frame.procs.length===0) frames[entry.pfn]=null;
+    }
+  });
+  delete processes[name];
+  plog('paging-log','Freed '+name,'warn');
+  renderFrameGrid();renderProcList();updateProcSelect();renderPageTable();updateStats();
+}
+
+function updateProcSelect(){
+  const s=document.getElementById('pt-proc-select');
+  const v=s.value;
+  s.innerHTML='<option value="">Select process…</option>';
+  Object.keys(processes).forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;s.appendChild(o)});
+  if(processes[v])s.value=v;
+  // virtual tab
+  const s2=document.getElementById('va-proc');
+  s2.innerHTML='<option value="">Select process</option>';
+  Object.keys(processes).forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;s2.appendChild(o)});
+}
+
+function forkProcess(){
+  const parentName=document.getElementById('pt-proc-select').value;
+  const parent=processes[parentName];
+  if(!parent){plog('paging-log','No process selected to fork','err');return}
+  const childName=parentName+'_child';
+  if(processes[childName]){plog('paging-log','Child process already exists: '+childName,'err');return}
+  const childEntries = parent.pageEntries.map(entry=>({
+    ...createPageEntry(entry.vpn, entry.pfn, true),
+    dirty: false,
+    referenced: entry.referenced
+  }));
+  const childMap = {};
+  childEntries.forEach(entry=>{childMap[entry.vpn]=entry});
+  processes[childName] = {color:COLORS[colorIdx++%COLORS.length],pageEntries:childEntries,pageMap:childMap};
+  parent.pageEntries.forEach(entry=>{entry.cow=true; const frame=frames[entry.pfn]; if(frame){ if(!frame.procs.includes(childName)) frame.procs.push(childName); frame.cow=true; }});
+  plog('paging-log','Forked '+parentName+' → '+childName+' with shared COW pages','ok');
+  renderFrameGrid(); renderProcList(); updateProcSelect(); renderPageTable(); updateStats();
+}
+
+function writeAccess(){
+  const procName=document.getElementById('pt-proc-select').value;
+  const proc=processes[procName];
+  const vpn=parseInt(document.getElementById('cow-vpn').value);
+  if(!proc){plog('paging-log','Select a process before write access','err');return}
+  const entry=getPageEntry(proc,vpn);
+  if(!entry||!entry.valid){plog('paging-log','VPN '+vpn+' not mapped for '+procName,'err');return}
+  if(!entry.cow){
+    entry.dirty=true;
+    entry.referenced=true;
+    plog('paging-log','Write access on VPN '+vpn+' for '+procName+' (no COW break needed)','ok');
+    renderPageTable();return;
+  }
+  const freeIdxs=frames.map((f,i)=>f===null?i:-1).filter(i=>i>=0);
+  if(freeIdxs.length===0){plog('paging-log','No free frames available to break COW','err');return}
+  const newFrame=freeIdxs[0];
+  const oldFrameIndex=entry.pfn;
+  const oldFrame=frames[oldFrameIndex];
+  frames[newFrame]={procs:[procName],cow:false};
+  entry.pfn=newFrame;
+  entry.cow=false;
+  entry.dirty=true;
+  entry.referenced=true;
+  if(oldFrame){
+    oldFrame.procs = oldFrame.procs.filter(owner=>owner!==procName);
+    oldFrame.cow = oldFrame.procs.length>1;
+    if(oldFrame.procs.length===0) frames[oldFrameIndex]=null;
+  }
+  plog('paging-log','Write access broke COW for '+procName+' VPN '+vpn+' → new frame '+newFrame,'ok');
+  renderFrameGrid(); renderPageTable(); updateStats();
+}
+
+function invalidateTLBEntry(vpn, procName){
+  const idx=tlb.findIndex(e=>e.vpn===vpn&&e.proc===procName);
+  if(idx>=0){
+    tlb.splice(idx,1);
+    plog('paging-log','TLB invalidated for VPN '+vpn+' ('+procName+')','warn');
+  }
+}
+
+function changePageMapping(){
+  const procName=document.getElementById('va-proc').value;
+  const proc=processes[procName];
+  if(!proc){plog('paging-log','Select a process before changing mapping','err');return}
+  const vaStr=document.getElementById('va-input').value.trim();
+  const va=parseInt(vaStr,16)||parseInt(vaStr,10)||0;
+  const vpn=va>>12;
+  const entry=getPageEntry(proc,vpn);
+  if(!entry||!entry.valid){plog('paging-log','Cannot change mapping: VPN '+vpn+' not present for '+procName,'err');return}
+  const freeIdxs=frames.map((f,i)=>f===null?i:-1).filter(i=>i>=0);
+  if(freeIdxs.length===0){plog('paging-log','No free frames available to update mapping','err');return}
+  const newFrame=freeIdxs[0];
+  const oldFrameIdx=entry.pfn;
+  const oldFrame=frames[oldFrameIdx];
+  frames[newFrame]={procs:[procName],cow:false};
+  entry.pfn=newFrame;
+  entry.dirty=false;
+  entry.referenced=false;
+  if(oldFrame){
+    oldFrame.procs = oldFrame.procs.filter(owner=>owner!==procName);
+    oldFrame.cow = oldFrame.procs.length>1;
+    if(oldFrame.procs.length===0) frames[oldFrameIdx]=null;
+  }
+  invalidateTLBEntry(vpn, procName);
+  flushTLB();
+  plog('paging-log','Changed mapping for '+procName+' VPN '+vpn+' to PFN '+newFrame+' and invalidated TLB','info');
+  renderFrameGrid(); renderPageTable(); updateStats();
+}
+
+function renderPageTable(){
+  const name=document.getElementById('pt-proc-select').value;
+  const el=document.getElementById('page-table-view');
+  if(!name||!processes[name]){el.innerHTML='<div class="muted">Select a process</div>';return}
+  const p=processes[name];
+  const entries = [...p.pageEntries].sort((a,b)=>a.vpn-b.vpn);
+  let html='<table class="ptable"><thead><tr><th>L1</th><th>L2</th><th>L3</th><th>VPN</th><th>PFN</th><th>Valid</th><th>COW</th><th>Dirty</th><th>Referenced</th></tr></thead><tbody>';
+  entries.forEach(entry=>{
+    const pa='0x'+((entry.pfn<<12)>>>0).toString(16).toUpperCase().padStart(8,'0');
+    html+=`<tr><td>${entry.l1}</td><td>${entry.l2}</td><td>${entry.l3}</td><td>${entry.vpn}</td><td>${entry.pfn}</td><td><span class="badge badge-green">${entry.valid?1:0}</span></td><td><span class="badge ${entry.cow?'badge-amber':'badge-gray'}">${entry.cow?'COW':'no'}</span></td><td><span class="badge ${entry.dirty?'badge-red':'badge-gray'}">${entry.dirty?1:0}</span></td><td><span class="badge badge-blue">${entry.referenced?1:0}</span></td></tr>`;
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+// ============================================================
+// SEGMENTATION
+// ============================================================
+const SEG_COLORS={Code:'#4C72B0',Stack:'#DD8452',Heap:'#55A868',Data:'#C44E52',BSS:'#8172B2'};
+const SEG_PERMS={Code:'1 0 1',Stack:'1 1 0',Heap:'1 1 0',Data:'1 1 0',BSS:'1 1 0'};
+
+function addSegInput(){
+  const row=document.createElement('div');row.className='row seg-input-row';
+  row.innerHTML='<select class="seg-type"><option>Code</option><option>Stack</option><option>Heap</option><option>Data</option><option>BSS</option></select><input class="seg-sz" type="number" value="2" min="1" max="20" style="width:60px"/><span class="muted">KB</span><button onclick="this.parentElement.remove()" style="padding:4px 8px;font-size:12px;color:var(--color-text-danger)">−</button>';
+  document.getElementById('seg-inputs').appendChild(row);
+}
+
+function allocSegments(){
+  const pname=document.getElementById('seg-pname').value.trim()||'Proc';
+  const rows=document.querySelectorAll('.seg-input-row');
+  let ptr=0;
+  // find first free start
+  const busy=segments.filter(s=>s).map(s=>({start:s.base,end:s.base+s.limit}));
+  busy.sort((a,b)=>a.start-b.start);
+  let cursor=0;
+  rows.forEach(row=>{
+    const type=row.querySelector('.seg-type').value;
+    const sz=parseInt(row.querySelector('.seg-sz').value)||2;
+    // find free spot
+    let base=cursor;
+    let ok=false;
+    for(let attempt=0;attempt<100&&!ok;attempt++){
+      ok=true;
+      for(const b of busy){if(base<b.end&&base+sz>b.start){base=b.end;ok=false;break}}
+      if(base+sz>SEG_MEM){plog('seg-log','Not enough space for '+type+' segment of '+pname,'err');return}
+    }
+    segments.push({proc:pname,type,base,limit:sz,r:1,w:type!=='Code'?1:0,x:type==='Code'?1:0});
+    busy.push({start:base,end:base+sz});busy.sort((a,b)=>a.start-b.start);
+    cursor=base+sz;
+    plog('seg-log','Mapped '+pname+'.'+type+' → base='+base+'KB, limit='+sz+'KB','ok');
+  });
+  renderSegTable();renderSegVisual();updateSegSelects();
+}
+
+function renderSegTable(){
+  const tb=document.getElementById('seg-tbody');
+  tb.innerHTML='';
+  segments.forEach((s,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${s.proc}</td><td><span class="badge" style="background:${SEG_COLORS[s.type]}22;color:${SEG_COLORS[s.type]}">${s.type}</span></td><td style="font-family:var(--font-mono,'Courier New');font-size:11px">${s.base}KB</td><td>${s.limit}KB</td><td class="muted">${s.r} ${s.w} ${s.x}</td><td><button class="danger" style="padding:2px 6px;font-size:11px" onclick="removeSeg(${i})">Free</button></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function removeSeg(i){
+  plog('seg-log','Freed '+segments[i].proc+'.'+segments[i].type,'warn');
+  segments.splice(i,1);
+  renderSegTable();renderSegVisual();updateSegSelects();
+}
+
+function renderSegVisual(){
+  const el=document.getElementById('seg-visual');
+  el.innerHTML='';
+  const scale=2; // 2px per KB
+  // collect all segments
+  const used=segments.map(s=>({start:s.base,end:s.base+s.limit,label:s.proc+'.'+s.type,type:s.type}));
+  used.sort((a,b)=>a.start-b.start);
+  let ptr=0;
+  used.forEach(u=>{
+    if(u.start>ptr){
+      const gap=document.createElement('div');
+      gap.className='seg-block';
+      gap.style.cssText=`height:${(u.start-ptr)*scale}px;background:var(--color-background-secondary);border:0.5px dashed var(--color-border-tertiary);color:var(--color-text-tertiary);font-size:10px;min-height:14px`;
+      gap.textContent='free '+(u.start-ptr)+'KB';
+      el.appendChild(gap);
+    }
+    const b=document.createElement('div');
+    b.className='seg-block';
+    const h=Math.max(24,u.end*scale-u.start*scale);
+    b.style.cssText=`height:${h}px;background:${SEG_COLORS[u.type]}33;border-left:3px solid ${SEG_COLORS[u.type]};color:${SEG_COLORS[u.type]};min-height:24px`;
+    b.textContent=u.label+' ('+((u.end-u.start))+'KB)';
+    el.appendChild(b);
+    ptr=u.end;
+  });
+  if(ptr<SEG_MEM){
+    const gap=document.createElement('div');
+    gap.className='seg-block';
+    gap.style.cssText=`height:${(SEG_MEM-ptr)*scale}px;background:var(--color-background-secondary);border:0.5px dashed var(--color-border-tertiary);color:var(--color-text-tertiary);font-size:10px;min-height:14px`;
+    gap.textContent='free '+(SEG_MEM-ptr)+'KB';
+    el.appendChild(gap);
+  }
+}
+
+function updateSegSelects(){
+  const s=document.getElementById('seg-select-proc');
+  const v=s.value;
+  s.innerHTML='';
+  [...new Set(segments.map(seg=>seg.proc))].forEach(p=>{const o=document.createElement('option');o.value=p;o.textContent=p;s.appendChild(o)});
+  if(v)s.value=v;
+  updateSegSegSelect();
+}
+function updateSegSegSelect(){
+  const proc=document.getElementById('seg-select-proc').value;
+  const s=document.getElementById('seg-select-seg');
+  s.innerHTML='';
+  segments.filter(seg=>seg.proc===proc).forEach((seg,i)=>{const o=document.createElement('option');o.value=i;o.textContent=seg.type;s.appendChild(o)});
+}
+
+function translateSegAddr(){
+  const offset=parseInt(document.getElementById('seg-addr-in').value)||0;
+  const sidx=parseInt(document.getElementById('seg-select-seg').value);
+  const seg=segments[sidx];
+  if(!seg){document.getElementById('seg-translate-result').innerHTML='<span class="addr-fault">No segment selected</span>';return}
+  if(offset>=seg.limit){document.getElementById('seg-translate-result').innerHTML='<span class="addr-fault">Segmentation Fault: offset '+offset+'KB ≥ limit '+seg.limit+'KB</span>';plog('seg-log','SEGFAULT: '+seg.proc+'.'+seg.type+' offset '+offset+'KB','err');return}
+  const phys=seg.base+offset;
+  document.getElementById('seg-translate-result').innerHTML=`<div class="addr-row" style="margin-top:8px"><span class="addr-label">Physical Address</span><span class="addr-val addr-highlight">${phys}KB (0x${(phys*1024).toString(16).toUpperCase().padStart(6,'0')})</span></div><div class="addr-row"><span class="addr-label">Segment</span><span class="addr-val">${seg.type} (base=${seg.base}KB)</span></div>`;
+  plog('seg-log','Translated '+seg.proc+'.'+seg.type+'+'+offset+'KB → PA '+phys+'KB','ok');
+}
+
+// ============================================================
+// VIRTUAL MEMORY
+// ============================================================
+function translateVA(){
+  const vaStr=document.getElementById('va-input').value.trim();
+  const va=parseInt(vaStr,16)||parseInt(vaStr,10)||0;
+  const procName=document.getElementById('va-proc').value;
+  const proc=processes[procName];
+
+  const vpn=va>>12;
+  const offset=va&0xFFF;
+  const l1=(vpn>>12)&0xFF;
+  const l2=(vpn>>4)&0xFF;
+  const l3=vpn&0xF;
+
+  tlbTotal++;
+  let pfn=null,tlbHit=false;
+  let entry = proc ? getPageEntry(proc,vpn) : null;
+
+  const te=tlb.find(e=>e.vpn===vpn&&e.proc===procName);
+  if(te){
+    pfn=te.pfn; tlbHit=true; tlbHits++; te.used=Date.now();
+    if(entry) entry.referenced=true;
+  } else {
+    if(entry && entry.valid){
+      pfn=entry.pfn;
+      entry.referenced=true;
+      tlb = tlb.slice(-7);
+      tlb.push({vpn,pfn,proc:procName,used:Date.now()});
+    }
+    if(pfn===null){
+      pageFaults++;
+      plog('paging-log','Page fault: VA 0x'+va.toString(16).toUpperCase()+' VPN '+vpn+' not mapped','err');
+    }
+  }
+
+  const res=document.getElementById('va-result');
+  const brk=document.getElementById('va-breakdown');
+  if(pfn!==null){
+    const pa=(pfn<<12)|offset;
+    res.innerHTML=`<div class="addr-row"><span class="addr-label">Virtual Address</span><span class="addr-val">0x${va.toString(16).toUpperCase().padStart(8,'0')}</span></div><div class="addr-row"><span class="addr-label">Physical Address</span><span class="addr-val addr-highlight">0x${pa.toString(16).toUpperCase().padStart(8,'0')}</span></div><div class="addr-row"><span class="addr-label">TLB</span><span class="addr-val ${tlbHit?'addr-highlight':'addr-fault'}">${tlbHit?'HIT':'MISS'}</span></div>`;
+    brk.innerHTML=`<div style="font-family:var(--font-mono,'Courier New');font-size:12px;line-height:1.8"><div><b>VA:</b> 0x${va.toString(16).toUpperCase().padStart(8,'0')} = ${va.toString(2).padStart(32,'0')}</div><div><b>L1 index:</b> ${l1}</div><div><b>L2 index:</b> ${l2}</div><div><b>L3 index:</b> ${l3}</div><div><b>Page offset:</b> 0x${offset.toString(16).padStart(3,'0')} (bits 11-0)</div><div><b>VPN:</b> ${vpn} → <b>PFN:</b> ${pfn}</div><div><b>PA:</b> 0x${(pfn<<12).toString(16).toUpperCase().padStart(8,'0')} + 0x${offset.toString(16).padStart(3,'0')}</div></div>`;
+    if(entry && entry.cow){
+      res.innerHTML += `<div class="addr-row"><span class="addr-label">Copy-on-Write</span><span class="addr-val">Shared page — write will allocate a new frame</span></div>`;
+    }
+  } else {
+    res.innerHTML=`<div class="addr-fault">PAGE FAULT — VPN ${vpn} not in physical memory<br><span class="muted">OS would load page from swap/disk</span></div>`;
+    brk.innerHTML=`<div style="font-size:12px;color:var(--color-text-secondary)">VA 0x${va.toString(16).toUpperCase().padStart(8,'0')}<br>VPN: ${vpn} → NOT PRESENT<br>L1: ${l1}, L2: ${l2}, L3: ${l3}, Offset: 0x${offset.toString(16).padStart(3,'0')}</div>`;
+  }
+  renderTLB();updateStats();
+}
+
+function renderTLB(){
+  const el=document.getElementById('tlb-view');
+  if(!tlb.length){el.innerHTML='<div class="muted">TLB empty (after flush)</div>';return}
+  let html='<div>';
+  tlb.slice(-8).reverse().forEach((e,i)=>{
+    html+=`<div class="tlb-entry"><span class="muted" style="min-width:20px">${i}</span><span>VPN<b> ${e.vpn}</b></span><span class="muted">→</span><span>PFN<b> ${e.pfn}</b></span><span class="badge badge-gray" style="margin-left:4px">${e.proc||'anon'}</span></div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function flushTLB(){tlb=[];plog('paging-log','TLB flushed (context switch)','warn');renderTLB();updateStats()}
+
+function simulatePageRef(){
+  const vpn=rand(0,15);
+  const hit=tlb.find(e=>e.vpn===vpn);
+  tlbTotal++;
+  if(hit){
+    tlbHits++;
+    document.getElementById('pr-info').textContent='Accessed VPN '+vpn+' → TLB HIT (PFN '+hit.pfn+')';
+    hit.used=Date.now();
+  } else {
+    pageFaults++;
+    const pfn=rand(0,TOTAL_FRAMES-1);
+    if(tlb.length>=8){
+      let min=Infinity, mi=0;
+      tlb.forEach((e,i)=>{if(e.used<min){min=e.used;mi=i}});
+      const old=tlb.splice(mi,1)[0];
+      document.getElementById('pr-info').textContent='VPN '+vpn+' → TLB MISS. Evicted VPN '+old.vpn+' (LRU). Mapped → PFN '+pfn;
+    } else {
+      document.getElementById('pr-info').textContent='VPN '+vpn+' → TLB MISS. Loaded → PFN '+pfn;
+    }
+    tlb.push({vpn,pfn,proc:'sim',used:Date.now()});
+  }
+  renderTLB();updateStats();
+}
+
+// Page fault LRU sim
+function initPFSim(){
+  pfSim={frames:Array(4).fill(null),refs:[],policy:'lru',ptr:0,clk:Array(4).fill(0)};
+  renderPFFrames();document.getElementById('pf-log').innerHTML='';
+}
+function renderPFFrames(){
+  const el=document.getElementById('pf-frames');
+  el.innerHTML='<div style="display:flex;gap:4px;align-items:center"><span class="muted" style="min-width:80px">Physical frames:</span>'+pfSim.frames.map((f,i)=>`<div style="width:40px;height:36px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;background:${f!==null?'var(--color-background-info)':'var(--color-background-secondary)'};border:0.5px solid ${f!==null?'var(--color-border-info)':'var(--color-border-tertiary)'};color:${f!==null?'var(--color-text-info)':'var(--color-text-tertiary)'}">${f!==null?f:'—'}</div>`).join('')+'</div>';
+}
+function simulateFault(){
+  const page=parseInt(document.getElementById('pf-ref').value);
+  const policy='lru';
+  pfSim.policy=policy;
+  if(pfSim.frames.includes(page)){
+    pfSim.refs=pfSim.refs.filter(r=>r!==page);pfSim.refs.push(page);
+    plog('pf-log','Page '+page+' → HIT (already in memory)','ok');
+    renderPFFrames();return;
+  }
+  pageFaults++;
+  plog('pf-log','DEMAND PAGING — Page '+page+' → PAGE FAULT','err');
+  if(pfSim.frames.includes(null)){
+    const i=pfSim.frames.indexOf(null);
+    pfSim.frames[i]=page;pfSim.refs.push(page);pfSim.clk[i]=1;plog('pf-log','Loaded page '+page+' → frame '+i,'info');
+  } else {
+    const lru=pfSim.refs[0];
+    const evict=pfSim.frames.indexOf(lru);
+    pfSim.refs.shift();
+    const old=pfSim.frames[evict];
+    plog('pf-log','Evicting page '+old+' from frame '+evict+' (LRU)','warn');
+    pfSim.frames[evict]=page;pfSim.refs=pfSim.refs.filter(r=>r!==old);pfSim.refs.push(page);pfSim.clk[evict]=1;
+  }
+  renderPFFrames();updateStats();
+}
+function clearPFSim(){initPFSim()}
+
+// ============================================================
+// FRAGMENTATION
+// ============================================================
+const EXT_COLORS=['#4C72B0','#DD8452','#55A868','#C44E52','#8172B2'];
+function initExtFrag(){
+  extFragInitialized=true;
+  extFragBlocks=[];
+  for(let i=0;i<32;i++)extFragBlocks.push({used:false,size:8,proc:null,color:null});
+  // pre-alloc some
+  [[0,'A'],[1,'A'],[3,'B'],[4,'B'],[4,'B'],[7,'C'],[8,'C']].forEach(([idx,name])=>{if(extFragBlocks[idx])extFragBlocks[idx]={used:true,size:8,proc:name,color:EXT_COLORS[['A','B','C','D','E'].indexOf(name)]}});
+  renderExtFrag();renderCompact();
+}
+function extFragStep(){
+  const free=extFragBlocks.filter(b=>!b.used);
+  if(!free.length){plog('frag-log','Memory full','err');return}
+  const idx=extFragBlocks.indexOf(free[rand(0,free.length-1)]);
+  const name=String.fromCharCode(65+rand(0,4));
+  extFragBlocks[idx]={used:true,size:8,proc:name,color:EXT_COLORS[name.charCodeAt(0)-65]};
+  // randomly free a block too
+  if(rand(0,2)===0){const used=extFragBlocks.filter(b=>b.used);if(used.length){const t=used[rand(0,used.length-1)];extFragBlocks[extFragBlocks.indexOf(t)]={used:false,size:8,proc:null,color:null};plog('frag-log','Freed block','warn')}}
+  renderExtFrag();renderCompact();plog('frag-log','Allocated 8KB to process '+name,'ok');
+}
+function resetExtFrag(){extFragInitialized=false;initExtFrag();plog('frag-log','Memory reset','info')}
+function compactMemory(){
+  const used=extFragBlocks.filter(b=>b.used);
+  const free=extFragBlocks.filter(b=>!b.used);
+  extFragBlocks=[...used,...free];
+  renderExtFrag();renderCompact();plog('frag-log','Compaction complete: all used blocks moved to start','ok');
+}
+function renderExtFrag(){
+  const el=document.getElementById('ext-frag-vis');
+  el.innerHTML='';
+  const usedCount=extFragBlocks.filter(b=>b.used).length;
+  const freeCount=32-usedCount;
+  let fragmented=false;
+  let seenFree=false;
+  extFragBlocks.forEach(b=>{if(!b.used)seenFree=true;else if(seenFree)fragmented=true});
+  extFragBlocks.forEach(b=>{
+    const d=document.createElement('div');
+    d.style.cssText=`width:28px;height:28px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;border:0.5px solid transparent`;
+    if(b.used){d.style.background=b.color;d.style.color='#fff';d.textContent=b.proc}
+    else{d.style.background='var(--color-background-secondary)';d.style.borderColor='var(--color-border-tertiary)';d.style.color='var(--color-text-tertiary)'}
+    el.appendChild(d);
+  });
+  document.getElementById('ext-frag-info').textContent=`Used: ${usedCount*8}KB / Free: ${freeCount*8}KB — ${fragmented?'⚠ FRAGMENTED: free space is non-contiguous':'✓ Contiguous free space'}`;
+}
+function calcInternalFrag(){
+  const sz=parseInt(document.getElementById('int-proc-size').value)||13;
+  const pageSize=4;
+  const pages=Math.ceil(sz/pageSize);
+  const wasted=pages*pageSize-sz;
+  const el=document.getElementById('int-frag-vis');
+  let html='<div style="display:flex;gap:2px;flex-wrap:wrap;margin-bottom:4px">';
+  for(let i=0;i<pages;i++){
+    const isLast=i===pages-1;
+    const usedKB=isLast?sz-(pages-1)*pageSize:pageSize;
+    const wastedKB=isLast?wasted:0;
+    html+=`<div title="Page ${i}" style="width:48px;height:48px;border-radius:4px;overflow:hidden;border:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column">`;
+    html+=`<div style="flex:${usedKB};background:#4C72B0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px">${usedKB}K</div>`;
+    if(wastedKB>0)html+=`<div style="flex:${wastedKB};background:#C44E5255;display:flex;align-items:center;justify-content:center;color:#C44E52;font-size:9px">${wastedKB}K</div>`;
+    html+='</div>';
+  }
+  html+='</div>';
+  el.innerHTML=html;
+  document.getElementById('int-frag-info').textContent=`${sz}KB process → ${pages} pages (${pages*pageSize}KB allocated) → Internal fragmentation: ${wasted}KB (${Math.round(wasted/pageSize/pages*100)}% of last page wasted)`;
+}
+function renderCompact(){
+  ['compact-before','compact-after'].forEach((id,isAfter)=>{
+    const el=document.getElementById(id);
+    el.innerHTML='';
+    const blocks=isAfter?[...extFragBlocks.filter(b=>b.used),...extFragBlocks.filter(b=>!b.used)]:extFragBlocks;
+    blocks.forEach(b=>{
+      const d=document.createElement('div');
+      d.style.cssText=`width:22px;height:22px;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:8px;margin:1px;border:0.5px solid transparent`;
+      if(b.used){d.style.background=b.color;d.style.color='#fff';d.textContent=b.proc}
+      else{d.style.background='var(--color-background-secondary)';d.style.borderColor='var(--color-border-tertiary)'}
+      el.appendChild(d);
+    });
+  });
+  const usedBlocks=extFragBlocks.filter(b=>b.used).length;
+  const freeBlocks=extFragBlocks.filter(b=>!b.used).length;
+  document.getElementById('compact-stats').textContent=`After compaction: ${usedBlocks} used blocks consolidated at start, ${freeBlocks} free blocks form one contiguous region of ${freeBlocks*8}KB`;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function resetAll(){
+  frames=Array(TOTAL_FRAMES).fill(null);
+  processes={};colorIdx=0;
+  pageFaults=0;tlbHits=0;tlbTotal=0;
+  tlb=[];
+  pfSim={frames:Array(4).fill(null),refs:[],policy:'lru',ptr:0,clk:Array(4).fill(0)};
+  extFragInitialized=false;
+  renderFrameGrid();renderProcList();updateProcSelect();renderPageTable();
+  renderTLB();renderPFFrames();
+  document.getElementById('va-result').innerHTML='';
+  document.getElementById('va-breakdown').innerHTML='';
+  document.getElementById('pf-log').innerHTML='';
+  ['paging-log','frag-log'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=''});
+  updateStats();plog('paging-log','System reset','info');
+  if(document.getElementById('panel-fragmentation').classList.contains('active'))initExtFrag();
+}
+
+// Boot
+(function boot(){
+  renderFrameGrid();renderProcList();updateProcSelect();renderPageTable();
+  renderTLB();
+  initPFSim();calcInternalFrag();updateStats();
+  plog('paging-log','Conceptual OS memory subsystem initialized — 64 frames × 4KB = 256KB physical memory','ok');
+
+  // Seed a demo process
+  const color=COLORS[colorIdx++%COLORS.length];
+  const pages=[0,1,2,3];
+  const {entries,map} = buildPageTable(pages);
+  processes['Kernel']={color,pageEntries:entries,pageMap:map};
+  pages.forEach(i=>{frames[i]={procs:['Kernel'],cow:false}});
+  renderFrameGrid();renderProcList();updateProcSelect();updateStats();
+  plog('paging-log','Allocated Kernel process to frames 0–3','ok');
+  document.getElementById('p-name').value='P1';
+})();
+</script>
